@@ -37,7 +37,7 @@ public class Master extends Client {
      *
      * @throws SocketException if there is an error creating the socket
      */
-    public void run() throws SocketException {
+    private void run() throws SocketException {
         datagramSocket = new DatagramSocket(getPort());
 
         masterCallback.masterMessage("Master mode activated on port " + getPort());
@@ -116,7 +116,7 @@ public class Master extends Client {
      * @throws SocketException if there is an error with the socket
      * @throws UnknownHostException if the IP address is unknown
      */
-    public InetAddress getAddress(String ip, int subnetMask) throws SocketException, UnknownHostException {
+    private InetAddress getAddress(String ip, int subnetMask) throws SocketException, UnknownHostException {
         byte[] ipBytes = InetAddress.getByName(ip).getAddress();
         int mask = -(1 << (32 - subnetMask));
         int ipAsInt = 0;
