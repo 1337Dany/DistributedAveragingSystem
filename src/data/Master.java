@@ -69,7 +69,7 @@ public class Master extends Client {
 
     private void broadcast(String string) {
         try {
-            InetAddress address = getAddresses(getMyIp(), getSubnetMask());
+            InetAddress address = getAddress(getMyIp(), getSubnetMask());
             datagramSocket.setBroadcast(true);
             DatagramPacket packet = new DatagramPacket(string.getBytes(), string.length(), address, getPort());
             datagramSocket.send(packet);
@@ -79,7 +79,7 @@ public class Master extends Client {
         }
     }
 
-    public InetAddress getAddresses(String ip, int subnetMask) throws SocketException, UnknownHostException {
+    public InetAddress getAddress(String ip, int subnetMask) throws SocketException, UnknownHostException {
         //  Transforming ip to byte massive
         byte[] ipBytes = InetAddress.getByName(ip).getAddress();
 
