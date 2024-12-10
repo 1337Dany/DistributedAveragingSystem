@@ -15,8 +15,7 @@ private final SlaveCallback slaveCallback;
     }
 
     private void run(){
-        try {
-            DatagramSocket socket = new DatagramSocket();
+        try (DatagramSocket socket = new DatagramSocket()){
             String message = String.valueOf(getNumber());
             InetAddress localHost = InetAddress.getByName("localhost");
             DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), localHost, getPort());
