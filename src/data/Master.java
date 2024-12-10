@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 
+/**
+ * The Master class extends the Client class and handles receiving and broadcasting messages.
+ */
 public class Master extends Client {
     private final MasterCallback masterCallback;
     private DatagramSocket datagramSocket;
@@ -14,6 +17,14 @@ public class Master extends Client {
     private boolean AVGRepeat = false;
     private int previousAVG;
 
+    /**
+     * Constructs a Master object.
+     *
+     * @param masterCallback the callback interface for master messages
+     * @param port the port number to bind the socket
+     * @param number the initial number to add to the list
+     * @throws SocketException if there is an error creating the socket
+     */
     public Master(MasterCallback masterCallback, int port, int number) throws SocketException {
         super(port, number);
         numbers.add(number);
@@ -21,10 +32,17 @@ public class Master extends Client {
         run();
     }
 
+    /**
+     * Runs the main loop to receive and process messages.
+     *
+     * @throws SocketException if there is an error creating the socket
+     */
     public void run() throws SocketException {
         datagramSocket = new DatagramSocket(getPort());
 
         masterCallback.masterMessage("Master mode activated on port " + getPort());
+        masterCallback.masterMessage("Initial number: " + getNumber());
+        masterCallback.masterMessage("Waiting for connections...");
 
         try {
             while (true) {
@@ -56,6 +74,11 @@ public class Master extends Client {
         }
     }
 
+    /**
+     * Calculates the average of the numbers in the list.
+     *
+     * @return the average of the numbers
+     */
     private int avg() {
         int sum = 0;
         for (int num : numbers) {
@@ -67,6 +90,11 @@ public class Master extends Client {
         return result;
     }
 
+    /**
+     * Broadcasts a message to the network.
+     *
+     * @param string the message to broadcast
+     */
     private void broadcast(String string) {
         try {
             InetAddress address = getAddress(getMyIp(), getSubnetMask());
@@ -79,21 +107,22 @@ public class Master extends Client {
         }
     }
 
+    /**
+     * Calculates the broadcast address based on the IP and subnet mask.
+     *
+     * @param ip the IP address
+     * @param subnetMask the subnet mask
+     * @return the broadcast address
+     * @throws SocketException if there is an error with the socket
+     * @throws UnknownHostException if the IP address is unknown
+     */
     public InetAddress getAddress(String ip, int subnetMask) throws SocketException, UnknownHostException {
-        //  Transforming ip to byte massive
         byte[] ipBytes = InetAddress.getByName(ip).getAddress();
-
-        //  Transforming mask number to the number which will be equal to the number of format like it should have
-        //  ones after mask length
         int mask = -(1 << (32 - subnetMask));
-
-        //  Transforming ip in type of number that are equal to its byte massive
         int ipAsInt = 0;
         for (byte b : ipBytes) {
             ipAsInt = (ipAsInt << 8) | (b & 0xFF);
         }
-
-        //  Using formula to merge ip and mask
         int broadcastAsInt = ipAsInt | ~mask;
         byte[] broadcastBytes = new byte[4];
         for (int i = 3; i >= 0; i--) {
@@ -103,20 +132,22 @@ public class Master extends Client {
         return InetAddress.getByAddress(broadcastBytes);
     }
 
+    /**
+     * Gets the local IP address.
+     *
+     * @return the local IP address
+     */
     private static String getMyIp() {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
-                //  Filtering inactive and 127.0.0.1 type interfaces
                 if (iface.isLoopback() || !iface.isUp())
                     continue;
 
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
-                //  Checking all inet addresses
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
-                    //  Filtering IPv4 addresses
                     if (addr instanceof Inet4Address) {
                         return addr.getHostAddress();
                     }
@@ -128,13 +159,16 @@ public class Master extends Client {
         return null;
     }
 
+    /**
+     * Gets the subnet mask of the local network.
+     *
+     * @return the subnet mask
+     */
     private int getSubnetMask() {
         try {
             InetAddress localHost = Inet4Address.getLocalHost();
             NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
-            //  Taking all network masks
             for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
-                //  Filtering subnet mask of IPv4 type
                 if (address.getAddress() instanceof Inet4Address) {
                     return address.getNetworkPrefixLength();
                 }
