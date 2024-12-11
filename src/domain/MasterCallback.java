@@ -10,4 +10,10 @@ public interface MasterCallback {
      * @param string the message to handle
      */
     void masterMessage(String string);
+    /**
+     * Handles an error message from the Master.
+     *
+     * @param string the message to handle
+     */
+    void masterErrorMessage(String string);
 }

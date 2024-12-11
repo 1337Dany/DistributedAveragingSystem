@@ -21,8 +21,8 @@ public class Master extends Client {
      * Constructs a Master object.
      *
      * @param masterCallback the callback interface for master messages
-     * @param port the port number to bind the socket
-     * @param number the initial number to add to the list
+     * @param port           the port number to bind the socket
+     * @param number         the initial number to add to the list
      * @throws SocketException if there is an error creating the socket
      */
     public Master(MasterCallback masterCallback, int port, int number) throws SocketException {
@@ -38,11 +38,14 @@ public class Master extends Client {
      * @throws SocketException if there is an error creating the socket
      */
     private void run() throws SocketException {
+        try {
         datagramSocket = new DatagramSocket(getPort());
+        }catch (IllegalArgumentException e){
+            masterCallback.masterErrorMessage("Incorrect input");
+            return;
+        }
 
         masterCallback.masterMessage("Master mode activated on port " + getPort());
-        masterCallback.masterMessage("Initial number: " + getNumber());
-        masterCallback.masterMessage("Waiting for connections...");
 
         try {
             while (true) {
@@ -69,8 +72,8 @@ public class Master extends Client {
                     numbers.add(received);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | NullPointerException e) {
+            masterCallback.masterErrorMessage("Incorrect input");
         }
     }
 
@@ -110,10 +113,10 @@ public class Master extends Client {
     /**
      * Calculates the broadcast address based on the IP and subnet mask.
      *
-     * @param ip the IP address
+     * @param ip         the IP address
      * @param subnetMask the subnet mask
      * @return the broadcast address
-     * @throws SocketException if there is an error with the socket
+     * @throws SocketException      if there is an error with the socket
      * @throws UnknownHostException if the IP address is unknown
      */
     private InetAddress getAddress(String ip, int subnetMask) throws SocketException, UnknownHostException {

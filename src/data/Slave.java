@@ -34,10 +34,8 @@ public class Slave extends Client {
             InetAddress localHost = InetAddress.getByName("localhost");
             DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), localHost, getPort());
             socket.send(packet);
-        } catch (SocketException | UnknownHostException e) {
-            slaveCallback.slveErrorMessage("Cannot find master");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            slaveCallback.slveErrorMessage("Cannot find master");
         }
     }
 }

@@ -46,6 +46,11 @@ public class DASPresenter implements MasterCallback, SlaveCallback {
     }
 
     @Override
+    public void masterErrorMessage(String string) {
+        consoleView.printErrorMessage(string);
+    }
+
+    @Override
     public void slaveMessage(String string) {
         consoleView.printMessage(string);
     }
